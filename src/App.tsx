@@ -1,7 +1,9 @@
 import { FC } from "react";
 
+import Converter from "./component/Converter";
+
 const App: FC = () => {
-  return <div className="App"></div>;
+  return <Converter />;
 };
 
 export default App;
