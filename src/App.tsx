@@ -1,7 +1,7 @@
 import { FC } from "react";
 
 import { getConversionAmountAndRate } from "./api/exchangerate-api";
-import Converter from "./component/Converter";
+import Converter from "./components/Converter";
 
 const App: FC = () => {
   return <Converter conversionApiCall={getConversionAmountAndRate} />;

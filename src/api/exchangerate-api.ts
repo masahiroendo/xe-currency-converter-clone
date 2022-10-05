@@ -1,4 +1,5 @@
-import { ConversionApiCallFunctionType } from "../component/Converter";
+import { currencies } from "../components/constants";
+import { ConversionApiCallFunctionType } from "../components/types";
 
 type ExchangeApiConvertResponseData = {
   motd: {
@@ -43,20 +44,25 @@ export const getConversionAmountAndRate: ConversionApiCallFunctionType = async (
     }
 
     const data: ExchangeApiConvertResponseData = await response.json();
-    console.log(data);
     return {
       rate: data.info.rate,
       result: data.result,
       date: new Date(data.date),
       error: null,
+      currency: currencies.find(
+        (currency) => currency.symbol === params.to
+      ) || { symbol: "N-A", text: "N-A" },
     };
   } catch (error) {
-    console.error(error);
     return {
       rate: 0,
       result: 0,
       date: new Date(),
       error: "Conversion failed. Reason: " + (error as Error).message,
+      currency: {
+        symbol: "N-A",
+        text: "N-A",
+      },
     };
   }
 };

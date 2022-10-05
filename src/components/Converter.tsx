@@ -1,26 +1,8 @@
 import { ChangeEvent, FC, FormEvent, useState } from "react";
 
-const currencies = [
-  { symbol: "USD", text: "US - US dollar" },
-  { symbol: "EUR", text: "EUR - Euro" },
-  { symbol: "JPY", text: "JPY - Japanese Yen" },
-  { symbol: "CNY", text: "CNY - Chinese Yuan Renminbi" },
-];
-
-const currencySymbols = currencies.map((c) => c.symbol);
-
-// type CurrencyType = typeof currencySymbols[number];
-
-export type ConversionApiCallFunctionType = (params: {
-  from: string;
-  to: string;
-  amount: number;
-}) => Promise<{
-  rate: number;
-  result: number;
-  date: Date;
-  error: string | null;
-}>;
+import { currencies, currencySymbols } from "./constants";
+import ConversionDisplay from "./ConversionDisplay";
+import { ConversionApiCallFunctionType, ConvertedDataType } from "./types";
 
 type ConverterProps = {
   conversionApiCall: ConversionApiCallFunctionType;
@@ -30,7 +12,9 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
   const [amount, setAmount] = useState<number>(0);
   const [fromCurrency, setFromCurrency] = useState<string>("USD");
   const [toCurrency, setToCurrency] = useState<string>("JPY");
-  const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
+  const [convertedData, setConvertedData] = useState<ConvertedDataType | null>(
+    null
+  );
 
   const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
@@ -65,14 +49,13 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
       return;
     }
 
-    console.log(amount, fromCurrency, toCurrency);
     // call exchange api
-    const { date, error, rate, result } = await conversionApiCall({
+    const convertedData = await conversionApiCall({
       from: fromCurrency,
       to: toCurrency,
       amount: amount,
     });
-    setConvertedAmount(result);
+    setConvertedData(convertedData);
   };
 
   const checkIfFormIsValid = (): boolean => {
@@ -131,10 +114,7 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
           <button disabled={!isFormValid}>Convert</button>
         </form>
       </div>
-      <div>{} </div>
-      <div>
-        Converted amount: {convertedAmount} {toCurrency}
-      </div>
+      {convertedData && <ConversionDisplay data={convertedData} />}
     </>
   );
 };
