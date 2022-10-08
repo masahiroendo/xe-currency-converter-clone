@@ -16,8 +16,8 @@ const ConversionDisplay: FC<ConversionDisplayProps> = ({ data }) => {
     );
   }
 
-  const toPrecision: number = data.rate >= 1 ? 3 : 8;
   const fromPrecision: number = data.rate >= 1 ? 8 : 3;
+  const toPrecision: number = data.rate >= 1 ? 3 : 8;
 
   return (
     <>

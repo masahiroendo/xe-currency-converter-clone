@@ -2,6 +2,7 @@ import { ChangeEvent, FC, FormEvent, useState } from "react";
 
 import { currencies, currencySymbols } from "./constants";
 import ConversionDisplay from "./ConversionDisplay";
+import ConversionExampleLists from "./ConversionExampleLists";
 import { ConversionApiCallFunctionType, ConvertedDataType } from "./types";
 
 type ConverterProps = {
@@ -115,6 +116,13 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
         </form>
       </div>
       {convertedData && <ConversionDisplay data={convertedData} />}
+      {convertedData && (
+        <ConversionExampleLists
+          rate={convertedData.rate}
+          currencyFrom={convertedData.currencyFrom}
+          currencyTo={convertedData.currencyTo}
+        />
+      )}
     </>
   );
 };
