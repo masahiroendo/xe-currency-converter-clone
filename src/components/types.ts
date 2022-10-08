@@ -8,7 +8,9 @@ export type ConvertedDataType = {
   result: number;
   date: Date;
   error: string | null;
-  currency: CurrencyType;
+  amount: number;
+  currencyFrom: CurrencyType;
+  currencyTo: CurrencyType;
 };
 
 export type ConversionApiCallFunctionType = (params: {
