@@ -39,24 +39,28 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
     setToCurrency(e.target.value);
   };
 
-  const swapCurrency = () => {
-    setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const checkFormAndCallApiAndUpdateState = async (
+    from: string,
+    to: string
+  ) => {
     if (!checkIfFormIsValid()) {
       return;
     }
 
     // call exchange api
-    const convertedData = await conversionApiCall({
-      from: fromCurrency,
-      to: toCurrency,
-      amount: amount,
-    });
+    const convertedData = await conversionApiCall({ from, to, amount: amount });
     setConvertedData(convertedData);
+  };
+
+  const swapCurrency = () => {
+    setFromCurrency(toCurrency);
+    setToCurrency(fromCurrency);
+    checkFormAndCallApiAndUpdateState(toCurrency, fromCurrency);
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    checkFormAndCallApiAndUpdateState(fromCurrency, toCurrency);
   };
 
   const checkIfFormIsValid = (): boolean => {
