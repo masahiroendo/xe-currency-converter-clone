@@ -1,4 +1,5 @@
 import { ChangeEvent, FC, FormEvent, useState } from "react";
+import { BsArrowLeftRight } from "react-icons/bs";
 
 import { currencies, currencySymbols } from "./constants";
 import ConversionDisplay from "./ConversionDisplay";
@@ -10,7 +11,7 @@ type ConverterProps = {
 };
 
 const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
-  const [amount, setAmount] = useState<number>(0);
+  const [amount, setAmount] = useState<number>(1);
   const [fromCurrency, setFromCurrency] = useState<string>("USD");
   const [toCurrency, setToCurrency] = useState<string>("JPY");
   const [convertedData, setConvertedData] = useState<ConvertedDataType | null>(
@@ -20,7 +21,7 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
   const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
     if (v === "") {
-      setAmount(0);
+      setAmount(1);
       return;
     }
 
@@ -76,8 +77,11 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
 
   return (
     <>
-      <div>
-        <form onSubmit={handleSubmit}>
+      <div className="min-h-[25vh] md:w-[1200px] bg-slate-50 shadow-xl hover:shadow-lg duration-200 flex flex-col items-center rounded-xl py-10 mb-10">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-6 md:flex-row justify-between items-center"
+        >
           <label htmlFor="amount">Amount</label>
           <input
             id="amount"
@@ -99,8 +103,12 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
             ))}
           </select>
 
-          <button type="button" onClick={swapCurrency}>
-            {"<- Change ->"}
+          <button
+            type="button"
+            className="inline-flex items-center justify-center bg-white duration-500 w-12 h-12 border-2 rounded-full border-blue-400 text-2xl text-blue-400 hover:bg-blue-400 hover:text-white"
+            onClick={swapCurrency}
+          >
+            <BsArrowLeftRight />
           </button>
 
           <label htmlFor="toCurrency">To</label>
@@ -119,14 +127,16 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
           <button disabled={!isFormValid}>Convert</button>
         </form>
       </div>
-      {convertedData && <ConversionDisplay data={convertedData} />}
-      {convertedData && (
-        <ConversionExampleLists
-          rate={convertedData.rate}
-          currencyFrom={convertedData.currencyFrom}
-          currencyTo={convertedData.currencyTo}
-        />
-      )}
+      <div className="m-10">
+        {convertedData && <ConversionDisplay data={convertedData} />}
+        {convertedData && (
+          <ConversionExampleLists
+            rate={convertedData.rate}
+            currencyFrom={convertedData.currencyFrom}
+            currencyTo={convertedData.currencyTo}
+          />
+        )}
+      </div>
     </>
   );
 };
