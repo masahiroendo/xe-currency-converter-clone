@@ -1,5 +1,6 @@
 import { ChangeEvent, FC, FormEvent, useState } from "react";
-import { BsArrowLeftRight } from "react-icons/bs";
+import Select, { SingleValue } from "react-select";
+import { BsArrowLeftRight, BsInfoCircle } from "react-icons/bs";
 
 import { currencies, currencySymbols } from "./constants";
 import ConversionDisplay from "./ConversionDisplay";
@@ -9,6 +10,8 @@ import { ConversionApiCallFunctionType, ConvertedDataType } from "./types";
 type ConverterProps = {
   conversionApiCall: ConversionApiCallFunctionType;
 };
+
+const labelStyle = "mb-3 block font-bold";
 
 const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
   const [amount, setAmount] = useState<number>(1);
@@ -32,12 +35,22 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
     setAmount(parseFloat(v));
   };
 
-  const fromCurrencySelectHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-    setFromCurrency(e.target.value);
+  const fromCurrencySelectHandler = (
+    option: SingleValue<{ label: string; value: string }>
+  ) => {
+    if (!option) {
+      return;
+    }
+    setFromCurrency(option.value);
   };
 
-  const toCurrencySelectHandler = (e: ChangeEvent<HTMLSelectElement>) => {
-    setToCurrency(e.target.value);
+  const toCurrencySelectHandler = (
+    option: SingleValue<{ label: string; value: string }>
+  ) => {
+    if (!option) {
+      return;
+    }
+    setToCurrency(option.value);
   };
 
   const checkFormAndCallApiAndUpdateState = async (
@@ -77,58 +90,81 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
 
   return (
     <>
-      <div className="min-h-[25vh] md:w-[1200px] bg-slate-50 shadow-xl hover:shadow-lg duration-200 flex flex-col items-center rounded-xl py-10 mb-10">
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-6 md:flex-row justify-between items-center"
-        >
-          <label htmlFor="amount">Amount</label>
-          <input
-            id="amount"
-            name="amount"
-            value={amount}
-            onChange={handleAmountChange}
-          />
-          <label htmlFor="fromCurrency">From</label>
-          <select
-            name="fromCurrency"
-            id="fromCurrency"
-            value={fromCurrency}
-            onChange={fromCurrencySelectHandler}
-          >
-            {currencies.map((c) => (
-              <option key={c.symbol} value={c.symbol}>
-                {c.text}
-              </option>
-            ))}
-          </select>
+      <div className="min-h-[25vh] md:w-[90vw] md:max-w-[1200px] bg-slate-50 shadow-xl hover:shadow-lg hover:duration-200 rounded-xl py-10 mb-10 px-5">
+        <form onSubmit={handleSubmit}>
+          <div className="max-md:flex max-md:flex-col md:items-center md:grid md:grid-cols-[minmax(100px,_1fr)_minmax(100px,_1fr)_auto_minmax(100px,_1fr)] gap-3">
+            <div className="flex flex-col">
+              <label className={labelStyle} htmlFor="amount">
+                Amount
+              </label>
+              <input
+                className="rounded-md font-bold border py-[6px] pl-6 text-[#6B7280] outline-none duration-200 focus:border-blue-500 focus:shadow-md"
+                id="amount"
+                name="amount"
+                value={amount}
+                onChange={handleAmountChange}
+              />
+            </div>
+            <div>
+              <label className={labelStyle} htmlFor="fromCurrency">
+                From
+              </label>
 
-          <button
-            type="button"
-            className="inline-flex items-center justify-center bg-white duration-500 w-12 h-12 border-2 rounded-full border-blue-400 text-2xl text-blue-400 hover:bg-blue-400 hover:text-white"
-            onClick={swapCurrency}
-          >
-            <BsArrowLeftRight />
-          </button>
+              <Select
+                isSearchable={true}
+                options={currencies.map((c) => ({
+                  label: c.text,
+                  value: c.symbol,
+                }))}
+                onChange={fromCurrencySelectHandler}
+              />
+            </div>
 
-          <label htmlFor="toCurrency">To</label>
-          <select
-            name="toCurrency"
-            id="toCurrency"
-            value={toCurrency}
-            onChange={toCurrencySelectHandler}
-          >
-            {currencies.map((c) => (
-              <option key={c.symbol} value={c.symbol}>
-                {c.text}
-              </option>
-            ))}
-          </select>
-          <button disabled={!isFormValid}>Convert</button>
+            <button
+              type="button"
+              className="md:self-end inline-flex items-center justify-center max-md:rotate-90 bg-white duration-500 w-12 h-12 border-2 rounded-full border-blue-400 text-2xl text-blue-400 hover:bg-blue-400 hover:text-white"
+              onClick={swapCurrency}
+            >
+              <BsArrowLeftRight />
+            </button>
+
+            <div>
+              <label className={labelStyle} htmlFor="toCurrency">
+                To
+              </label>
+              <Select
+                isSearchable={true}
+                options={currencies.map((c) => ({
+                  label: c.text,
+                  value: c.symbol,
+                }))}
+                onChange={toCurrencySelectHandler}
+              />
+            </div>
+          </div>
+          <div className="flex justify-between md:items-end mt-6 max-md:gap-3 max-md:flex-col-reverse">
+            <div className="p-2 text-gray-500 bg-blue-100 text-xs flex justify-center items-center gap-3 max-w-[480px] rounded">
+              <BsInfoCircle size={36} />
+              <span>
+                We use the mid-market rate for our Converter. This is for
+                informational purposes only. You won't receive this rate when
+                sending money.{" "}
+                <a href="/#" className="text-blue-500">
+                  Check send rates
+                </a>
+              </span>
+            </div>
+            <button
+              className="font-bold bg-blue-600 hover:bg-blue-500 active:bg-blue-800 text-white text-md py-3 px-6 rounded-lg"
+              disabled={!isFormValid}
+            >
+              Convert
+            </button>
+          </div>
         </form>
-      </div>
-      <div className="m-10">
         {convertedData && <ConversionDisplay data={convertedData} />}
+      </div>
+      <div className="mt-10">
         {convertedData && (
           <ConversionExampleLists
             rate={convertedData.rate}
