@@ -6,6 +6,7 @@ import { currencies, currencySymbols } from "./constants";
 import ConversionDisplay from "./ConversionDisplay";
 import ConversionExampleLists from "./ConversionExampleLists";
 import { ConversionApiCallFunctionType, ConvertedDataType } from "./types";
+import { findCurrencyFromSymbol } from "../api/exchangerate-api";
 
 type ConverterProps = {
   conversionApiCall: ConversionApiCallFunctionType;
@@ -15,11 +16,12 @@ const labelStyle = "mb-3 block font-bold";
 
 const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
   const [amount, setAmount] = useState<number>(1);
-  const [fromCurrency, setFromCurrency] = useState<string>("USD");
-  const [toCurrency, setToCurrency] = useState<string>("JPY");
+  const [fromCurrency, setFromCurrency] = useState<string>("");
+  const [toCurrency, setToCurrency] = useState<string>("");
   const [convertedData, setConvertedData] = useState<ConvertedDataType | null>(
     null
   );
+  const [fromSign, setFromSign] = useState("");
 
   const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value;
@@ -42,6 +44,8 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
       return;
     }
     setFromCurrency(option.value);
+    const newCurrency = findCurrencyFromSymbol(option.value);
+    setFromSign(newCurrency.sign);
   };
 
   const toCurrencySelectHandler = (
@@ -82,7 +86,9 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
       amount !== 0 &&
       currencySymbols.includes(fromCurrency) &&
       currencySymbols.includes(toCurrency) &&
-      fromCurrency !== toCurrency
+      fromCurrency !== toCurrency &&
+      !!fromCurrency &&
+      !!toCurrency
     );
   };
 
@@ -97,13 +103,20 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
               <label className={labelStyle} htmlFor="amount">
                 Amount
               </label>
-              <input
-                className="rounded-md font-bold border py-[6px] pl-6 text-[#6B7280] outline-none duration-200 focus:border-blue-500 focus:shadow-md"
-                id="amount"
-                name="amount"
-                value={amount}
-                onChange={handleAmountChange}
-              />
+              <div className="flex relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-2">
+                  <button className="p-1 focus:outline-none focus:shadow-outline">
+                    <span>{fromSign}</span>
+                  </button>
+                </span>
+                <input
+                  className="grow rounded-md font-bold border py-2 pl-7 text-[#6B7280] outline-none duration-200 focus:border-blue-500 focus:shadow-md"
+                  id="amount"
+                  name="amount"
+                  value={amount}
+                  onChange={handleAmountChange}
+                />
+              </div>
             </div>
             <div>
               <label className={labelStyle} htmlFor="fromCurrency">
@@ -117,9 +130,9 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
                   value: c.symbol,
                 }))}
                 onChange={fromCurrencySelectHandler}
+                placeholder="Choose from Currency..."
               />
             </div>
-
             <button
               type="button"
               className="md:self-end inline-flex items-center justify-center max-md:rotate-90 bg-white duration-500 w-12 h-12 border-2 rounded-full border-blue-400 text-2xl text-blue-400 hover:bg-blue-400 hover:text-white"
@@ -139,6 +152,7 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
                   value: c.symbol,
                 }))}
                 onChange={toCurrencySelectHandler}
+                placeholder="Choose target currency ..."
               />
             </div>
           </div>
@@ -155,7 +169,7 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
               </span>
             </div>
             <button
-              className="font-bold bg-blue-600 hover:bg-blue-500 active:bg-blue-800 text-white text-md py-3 px-6 rounded-lg"
+              className="font-bold bg-blue-600 hover:bg-blue-500 active:bg-blue-800 text-white text-md py-3 px-6 rounded-lg disabled:opacity-50 disabled:bg-gray-400"
               disabled={!isFormValid}
             >
               Convert

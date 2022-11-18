@@ -25,7 +25,7 @@ const unknownCurrency = Object.freeze({
   sign: "N-A",
 });
 
-const findCurrencyFromSymbol = (symbol: string): CurrencyType => {
+export const findCurrencyFromSymbol = (symbol: string): CurrencyType => {
   return (
     currencies.find((currency) => currency.symbol === symbol) || unknownCurrency
   );
