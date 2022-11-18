@@ -19,7 +19,7 @@ type ExchangeApiConvertResponseData = {
   result: number;
 };
 
-const unknownCurrency = Object.freeze({
+export const unknownCurrency = Object.freeze({
   symbol: "N-A",
   text: "N-A",
   sign: "N-A",

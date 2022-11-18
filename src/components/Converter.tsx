@@ -6,7 +6,10 @@ import { currencies, currencySymbols } from "./constants";
 import ConversionDisplay from "./ConversionDisplay";
 import ConversionExampleLists from "./ConversionExampleLists";
 import { ConversionApiCallFunctionType, ConvertedDataType } from "./types";
-import { findCurrencyFromSymbol } from "../api/exchangerate-api";
+import {
+  findCurrencyFromSymbol,
+  unknownCurrency,
+} from "../api/exchangerate-api";
 
 type ConverterProps = {
   conversionApiCall: ConversionApiCallFunctionType;
@@ -37,15 +40,19 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
     setAmount(parseFloat(v));
   };
 
+  const updateFromCurrencySign = (symbol: string): void => {
+    const newCurrency = findCurrencyFromSymbol(symbol);
+    setFromSign(() => newCurrency.sign);
+  };
+
   const fromCurrencySelectHandler = (
     option: SingleValue<{ label: string; value: string }>
   ) => {
     if (!option) {
       return;
     }
-    setFromCurrency(option.value);
-    const newCurrency = findCurrencyFromSymbol(option.value);
-    setFromSign(newCurrency.sign);
+    setFromCurrency(() => option.value);
+    updateFromCurrencySign(option.value);
   };
 
   const toCurrencySelectHandler = (
@@ -67,12 +74,13 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
 
     // call exchange api
     const convertedData = await conversionApiCall({ from, to, amount: amount });
-    setConvertedData(convertedData);
+    setConvertedData(() => convertedData);
   };
 
   const swapCurrency = () => {
-    setFromCurrency(toCurrency);
-    setToCurrency(fromCurrency);
+    setFromCurrency(() => toCurrency);
+    setToCurrency(() => fromCurrency);
+    updateFromCurrencySign(toCurrency);
     checkFormAndCallApiAndUpdateState(toCurrency, fromCurrency);
   };
 
@@ -92,8 +100,24 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
     );
   };
 
-  const isFormValid = checkIfFormIsValid();
+  const getReactSelectValueFromSymbol = (
+    symbol: string
+  ): { label: string; value: string } | null => {
+    const curr = findCurrencyFromSymbol(symbol);
+    if (curr === unknownCurrency) {
+      return null;
+    }
+    return {
+      label: `${curr.flag} ${curr.text}`,
+      value: curr.symbol,
+    };
+  };
 
+  const isFormValid = checkIfFormIsValid();
+  const options = currencies.map((c) => ({
+    label: `${c.flag} ${c.text}`,
+    value: c.symbol,
+  }));
   return (
     <>
       <div className="min-h-[25vh] md:w-[90vw] md:max-w-[1200px] bg-slate-50 shadow-xl hover:shadow-lg hover:duration-200 rounded-xl py-10 mb-10 px-5">
@@ -125,10 +149,8 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
 
               <Select
                 isSearchable={true}
-                options={currencies.map((c) => ({
-                  label: c.text,
-                  value: c.symbol,
-                }))}
+                options={options}
+                value={getReactSelectValueFromSymbol(fromCurrency)}
                 onChange={fromCurrencySelectHandler}
                 placeholder="Choose from Currency..."
               />
@@ -147,10 +169,8 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
               </label>
               <Select
                 isSearchable={true}
-                options={currencies.map((c) => ({
-                  label: c.text,
-                  value: c.symbol,
-                }))}
+                options={options}
+                value={getReactSelectValueFromSymbol(toCurrency)}
                 onChange={toCurrencySelectHandler}
                 placeholder="Choose target currency ..."
               />
