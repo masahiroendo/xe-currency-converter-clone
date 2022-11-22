@@ -19,12 +19,15 @@ type ExchangeApiConvertResponseData = {
   result: number;
 };
 
-const findCurrencyFromSymbol = (symbol: string): CurrencyType => {
+export const unknownCurrency = Object.freeze({
+  symbol: "N-A",
+  text: "N-A",
+  sign: "N-A",
+});
+
+export const findCurrencyFromSymbol = (symbol: string): CurrencyType => {
   return (
-    currencies.find((currency) => currency.symbol === symbol) || {
-      symbol: "N-A",
-      text: "N-A",
-    }
+    currencies.find((currency) => currency.symbol === symbol) || unknownCurrency
   );
 };
 
@@ -61,14 +64,8 @@ export const getConversionAmountAndRate: ConversionApiCallFunctionType = async (
       result: 0,
       date: new Date(),
       error: "Conversion failed. Reason: " + (error as Error).message,
-      currencyFrom: {
-        symbol: "N-A",
-        text: "N-A",
-      },
-      currencyTo: {
-        symbol: "N-A",
-        text: "N-A",
-      },
+      currencyFrom: unknownCurrency,
+      currencyTo: unknownCurrency,
     };
   }
 };

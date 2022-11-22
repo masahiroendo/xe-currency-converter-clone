@@ -1,6 +1,8 @@
 export type CurrencyType = {
   symbol: string;
   text: string;
+  sign: string;
+  flag?: string;
 };
 
 export type ConvertedDataType = {
