@@ -12,7 +12,7 @@ const App: FC = () => {
           The international unofficial currency Converter
         </h2>
       </div>
-      <div className="flex flex-col md:justify-center md:items-center -mt-[100px] mx-4">
+      <div className="flex flex-col md:justify-center md:items-center -mt-[80px] mx-4">
         <Converter conversionApiCall={getConversionAmountAndRate} />
       </div>
     </div>

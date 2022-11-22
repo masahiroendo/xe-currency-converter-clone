@@ -1,7 +1,7 @@
 import { FC } from "react";
-import accounting from "accounting";
 
 import { ConvertedDataType } from "./types";
+import FormatCurrency from "./FormatCurrency";
 
 type ConversionDisplayProps = {
   data: ConvertedDataType;
@@ -20,24 +20,13 @@ const ConversionDisplay: FC<ConversionDisplayProps> = ({ data }) => {
   const fromPrecision: number = data.rate >= 1 ? 8 : 3;
   const toPrecision: number = data.rate >= 1 ? 3 : 8;
 
-  const formatCurrency = (amount: number, text: string): string => {
-    const formattedAmount = accounting.formatMoney(amount, {
-      symbol: text,
-      format: "%v %s",
-      decimal: ".",
-      precision: 2,
-      thousand: ",",
-    });
-    return formattedAmount;
-  };
-
   return (
     <div className="mt-6">
       <p className="font-bold text-md text-gray-500 leading-[1.7]">
-        {formatCurrency(data.amount, data.currencyFrom.text)} ={" "}
+        <FormatCurrency amount={data.amount} text={data.currencyFrom.text} />
       </p>
       <p className="font-bold text-3xl text-gray-700 leading-[51px] mb-6">
-        {formatCurrency(data.result, data.currencyTo.text)}{" "}
+        <FormatCurrency amount={data.result} text={data.currencyTo.text} />
       </p>
       <div className="text-sm text-gray-600">
         <p>

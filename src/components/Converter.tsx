@@ -10,6 +10,7 @@ import {
   findCurrencyFromSymbol,
   unknownCurrency,
 } from "../api/exchangerate-api";
+import { mainContainer, tablesContainer } from "../tailwindClasses";
 
 type ConverterProps = {
   conversionApiCall: ConversionApiCallFunctionType;
@@ -120,7 +121,7 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
   }));
   return (
     <>
-      <div className="min-h-[25vh] md:w-[90vw] md:max-w-[1200px] bg-slate-50 shadow-xl hover:shadow-lg hover:duration-200 rounded-xl py-10 mb-10 px-5">
+      <div className={`min-h-[25vh] ${mainContainer}`}>
         <form onSubmit={handleSubmit}>
           <div className="max-md:flex max-md:flex-col md:items-center md:grid md:grid-cols-[minmax(100px,_1fr)_minmax(100px,_1fr)_auto_minmax(100px,_1fr)] gap-3">
             <div className="flex flex-col">
@@ -198,7 +199,7 @@ const Converter: FC<ConverterProps> = ({ conversionApiCall }) => {
         </form>
         {convertedData && <ConversionDisplay data={convertedData} />}
       </div>
-      <div className="mt-10">
+      <div className={tablesContainer}>
         {convertedData && (
           <ConversionExampleLists
             rate={convertedData.rate}
